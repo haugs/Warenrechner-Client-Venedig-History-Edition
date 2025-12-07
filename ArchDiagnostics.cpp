@@ -2,6 +2,13 @@
 
 #include <sstream>
 
+// NOTE: This helper currently has no callers, but it is intentionally kept around.
+// When the memory reader fails it is often because the GUI client and the running
+// game use different CPU architectures (32-bit vs. 64-bit, WOW64, etc.).
+// DescribeProcessArchitecture() gives us a ready-made diagnostic dump that can be
+// plugged back into the GUI if we ever need to troubleshoot those cases again,
+// so the implementation remains in the tree even while it stays unused.
+
 namespace {
 
 std::wstring MachineToString(USHORT machine) {

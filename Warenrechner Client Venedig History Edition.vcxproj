@@ -127,7 +127,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ArchDiagnostics.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PopulationReader.cpp">
+      <PreprocessorDefinitions>POPULATION_READER_STANDALONE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ArchDiagnostics.h" />
+    <ClInclude Include="PopulationReader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
