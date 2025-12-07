@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include "ArchDiagnostics.h"
 
 // Global variables
 const std::wstring windowTitle = L"ANNO 1404 Venedig";
@@ -152,6 +153,7 @@ void CopyToClipboard(const std::string& text, HWND hwndOwner) {
     //MessageBoxW(hwndOwner, L"Text copied to clipboard successfully.", L"Success", MB_ICONINFORMATION);
 }
 
+
 // Window procedure
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     static HWND hButton;
@@ -223,7 +225,41 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             // Get the Base Address
             uintptr_t baseAddress = GetModuleBaseAddress(pid, processName);
             if (baseAddress == 0) {
-                MessageBoxW(hwnd, L"Failed to get module base address.", L"Error", MB_ICONERROR);
+                // Debug: List all modules in the process
+                std::wstringstream debugMsg;
+                debugMsg << L"Failed to get module base address for: " << processName << L"\r\n\r\n";
+                debugMsg << DescribeProcessArchitecture(hProcess) << L"\r\n";
+                debugMsg << L"Modules found in process (PID: " << pid << L"):\r\n";
+                
+                HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid);
+                if (snapshot == INVALID_HANDLE_VALUE) {
+                    DWORD err = GetLastError();
+                    debugMsg << L"CreateToolhelp32Snapshot failed with error: " << err << L"\r\n";
+                    if (err == ERROR_ACCESS_DENIED) {
+                        debugMsg << L"(ERROR_ACCESS_DENIED - Try running as Administrator)\r\n";
+                    } else if (err == ERROR_PARTIAL_COPY) {
+                        debugMsg << L"(ERROR_PARTIAL_COPY - 32/64-bit mismatch between this tool and target process)\r\n";
+                    }
+                } else {
+                    MODULEENTRY32W me;
+                    me.dwSize = sizeof(MODULEENTRY32W);
+                    if (Module32FirstW(snapshot, &me)) {
+                        int count = 0;
+                        do {
+                            debugMsg << L"  - " << me.szModule << L" (Base: 0x" << std::hex << reinterpret_cast<uintptr_t>(me.modBaseAddr) << std::dec << L")\r\n";
+                            count++;
+                            if (count >= 20) {
+                                debugMsg << L"  ... (showing first 20 modules only)\r\n";
+                                break;
+                            }
+                        } while (Module32NextW(snapshot, &me));
+                    } else {
+                        debugMsg << L"Module32FirstW failed with error: " << GetLastError() << L"\r\n";
+                    }
+                    CloseHandle(snapshot);
+                }
+                
+                SetWindowTextW(hEdit, debugMsg.str().c_str());
                 CloseHandle(hProcess);
                 EnableWindow(hButton, TRUE);
                 break;
