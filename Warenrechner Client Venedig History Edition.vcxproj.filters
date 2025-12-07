@@ -15,21 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="ArchDiagnostics.cpp">
+    <ClCompile Include="src\ArchDiagnostics.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="PopulationReader.cpp">
+    <ClCompile Include="src\PopulationReader.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ArchDiagnostics.h">
+    <ClInclude Include="include\ArchDiagnostics.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="PopulationReader.h">
+    <ClInclude Include="include\PopulationReader.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
